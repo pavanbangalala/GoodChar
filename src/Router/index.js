@@ -1,4 +1,4 @@
 import createRootNavigator from './MainRoute';
 import { createAppContainer } from 'react-navigation';
 
-export default isSignedIn => createAppContainer(createRootNavigator(isSignedIn));
+export default isSignedIn => createAppContainer(createRootNavigator());

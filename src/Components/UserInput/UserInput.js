@@ -13,15 +13,17 @@ export default class UserInput extends Component {
 	}
 
 	handleTextChange = value => {
-		this.setState({ text: value });
+		this.setState({ text: value }, () => this.props.onChangeText(this.state.text));
 	};
 
+	componentDidMount() {}
 	render() {
 		const { placeHolder } = this.props;
 		return (
 			<View style={Styles.container}>
 				<TextInput
-					onChangeText={this.handleTextChange}
+					ref={component => (this.ref = component)}
+					onChangeText={value => this.handleTextChange(value)}
 					style={Styles.input}
 					placeholder={placeHolder}
 					value={this.state.text}

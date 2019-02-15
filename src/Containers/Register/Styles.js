@@ -1,10 +1,11 @@
 import eStyleSheet from 'react-native-extended-stylesheet';
 import { Dimensions } from 'react-native';
 
-const logoNormalWidth = Dimensions.get('window').width / 2;
-const logoMinWidth = logoNormalWidth / 2;
+const imageWidth = Dimensions.get('window').width / 2;
 
 export default eStyleSheet.create({
+	$logoNormalWidth: imageWidth,
+	$logoMinWidth: imageWidth / 2,
 	container: {
 		flex: 1,
 		backgroundColor: '$containerBkColor',
@@ -18,11 +19,11 @@ export default eStyleSheet.create({
 		marginVertical: 16,
 	},
 	logNormal: {
-		width: logoNormalWidth,
-		height: logoNormalWidth,
+		width: '$logoNormalWidth',
+		height: '$logoNormalWidth',
 	},
 	logoMin: {
-		width: logoMinWidth,
-		height: logoMinWidth,
+		width: '$logoMinWidth',
+		height: '$logoMinWidth',
 	},
 });

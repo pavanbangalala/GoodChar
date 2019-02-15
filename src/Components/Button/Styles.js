@@ -6,7 +6,9 @@ export default eStyleSheet.create({
 		borderRadius: 4,
 		borderColor: '#7D4976',
 		borderWidth: 1,
-		marginVertical: 24,
+		marginVertical: 8,
+		alignItems: 'center',
+		justifyContent: 'center',
 	},
 	touchable: {
 		marginVertical: 8,

@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { View, Image, Text, Alert } from 'react-native';
+import { View, Platform, Text, Alert, Animated, Keyboard, KeyboardAvoidingView, SafeAreaView } from 'react-native';
 import Styles from './Styles';
 import { UserInput } from '../../Components/UserInput';
 import { Button } from '../../Components/Button';
 import { TextLink } from '../../Components/TextLink';
+import * as firebase from 'firebase';
 
 const logo = require('../../../assets/ie.png');
 
@@ -12,10 +13,106 @@ export default class Register extends Component {
 		super();
 		this.handleRegisterButton = this.handleRegisterButton.bind(this);
 		this.handleLoginButtoon = this.handleLoginButtoon.bind(this);
+		this.state = {
+			userName: '',
+			email: '',
+			password: '',
+			confirmPassword: '',
+		};
+		this.logoSize = new Animated.Value(Styles.$logoNormalWidth);
+		this.fontSize = new Animated.Value(40);
+		this.userInputMargin = new Animated.Value(16);
 	}
 
-	handleRegisterButton = () => {
-		Alert.alert('Registered in Succesfully');
+	handleRegisterButton = async () => {
+		if (this.state.userName.length === 0) {
+			Alert.alert('Enter a valid user name');
+		}
+		if (this.state.email.length === 0) {
+			Alert.alert('Enter a valid email address');
+		}
+		if (this.state.password.length === 0) {
+			Alert.alert('Enter a valid password');
+		}
+		if (this.state.confirmPassword.length === 0 || this.state.password !== this.state.confirmPassword) {
+			Alert.alert('Passwords do not match');
+		}
+		const { email, password } = this.state;
+		const uid = '';
+		const returnCode = await firebase
+			.auth()
+			.createUserWithEmailAndPassword(email, password)
+			.then(user => {
+				console.log('email', user.email);
+				console.log('uid', user.uid);
+				uid = user.uid;
+				return 200;
+			})
+			.catch(error => {
+				console.log(error);
+				if (error.code === 'auth/email-already-in-use') {
+					return 201;
+				}
+				return 203;
+			});
+
+		console.log('return code = ', returnCode);
+		if (returnCode === 200) {
+			console.log('saving user ', this.state.email);
+			firebase
+				.database()
+				.ref(`users/${uid}`)
+				.set({
+					name: this.state.userName,
+					email: this.state.email,
+					isAdmin: this.state.email === 'pawan.bangalala@gmail.com' ? true : false,
+				});
+			Alert.alert('Registered in Succesfully');
+		} else if (returnCode === 201) {
+			Alert.alert('Already an existing user');
+		} else {
+			Alert.alert('Registration faiiled');
+		}
+	};
+
+	componentDidMount() {
+		const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+		const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+		this.keyboardShowListener = Keyboard.addListener(showEvent, this.keyboardShow);
+		this.keyboardHideListener = Keyboard.addListener(hideEvent, this.keyboardHide);
+	}
+
+	componentWillUnmount() {
+		this.keyboardShowListener.remove();
+		this.keyboardHideListener.remove();
+	}
+
+	keyboardShow = () => {
+		Animated.parallel([
+			Animated.timing(this.logoSize, {
+				toValue: Styles.$logoMinWidth,
+			}),
+			Animated.timing(this.fontSize, {
+				toValue: 20,
+			}),
+			Animated.timing(this.userInputMargin, {
+				toValue: 4,
+			}),
+		]).start();
+	};
+
+	keyboardHide = () => {
+		Animated.parallel([
+			Animated.timing(this.logoSize, {
+				toValue: Styles.$logoNormalWidth,
+			}),
+			Animated.timing(this.fontSize, {
+				toValue: 40,
+			}),
+			Animated.timing(this.userInputMargin, {
+				toValue: 16,
+			}),
+		]).start();
 	};
 
 	handleLoginButtoon = () => {
@@ -23,22 +120,44 @@ export default class Register extends Component {
 	};
 
 	render() {
-		return (
-			<View style={Styles.container}>
-				<View style={{ marginVertical: 32 }}>
-					<View style={Styles.logoContainer}>
-						<Image source={logo} resizeMode="cover" style={Styles.logNormal} />
-					</View>
+		const logoStyle = { width: this.logoSize, height: this.logoSize };
+		const logoTextStyle = { color: '#7D4976', fontSize: this.fontSize, fontWeight: '700' };
 
-					<Text style={{ color: '#7D4976', fontSize: 40, fontWeight: '700' }}>Good Char</Text>
-				</View>
-				<UserInput placeHolder="User Name" />
-				<UserInput placeHolder="E-maiil" />
-				<UserInput placeHolder="Password" />
-				<UserInput placeHolder="Confirm Password" />
-				<Button label="Register" onPress={this.handleLoginButton} />
-				<TextLink label1="already a volunteer? " label2="Login" onPress={this.handleLoginButtoon} />
-			</View>
+		return (
+			<SafeAreaView style={Styles.container}>
+				<KeyboardAvoidingView
+					behavior={Platform.OS === 'ios' ? 'padding' : null}
+					style={{
+						width: '100%',
+						justifyContent: 'center',
+						alignItems: 'center',
+						paddingBottom: 24,
+					}}
+				>
+					<Animated.View style={{ marginBottom: this.userInputMargin }}>
+						<Animated.View style={[Styles.logoContainer, { marginVertical: this.userInputMargin }]}>
+							<Animated.Image source={logo} resizeMode="cover" style={logoStyle} />
+						</Animated.View>
+
+						<Animated.Text style={logoTextStyle}>Good Char</Animated.Text>
+					</Animated.View>
+
+					<UserInput placeHolder="User Name" onChangeText={value => this.setState({ userName: value })} />
+					<UserInput placeHolder="E-maiil" onChangeText={value => this.setState({ email: value })} />
+					<UserInput
+						placeHolder="Password"
+						onChangeText={value => this.setState({ password: value })}
+						marginVertical={this.userInputMargin}
+					/>
+					<UserInput
+						placeHolder="Confirm Password"
+						onChangeText={value => this.setState({ confirmPassword: value })}
+					/>
+					<Button label="Register" onPress={this.handleRegisterButton} />
+
+					<TextLink label1="already a volunteer? " label2="Login" onPress={this.handleLoginButtoon} />
+				</KeyboardAvoidingView>
+			</SafeAreaView>
 		);
 	}
 }

@@ -9,6 +9,7 @@ import { Reports } from '../Containers/Reports';
 import { Assets } from '../Containers/Assets';
 import { Volunteer } from '../Containers/Volunteer';
 import { Icon } from 'react-native-elements';
+import { SplashScreen } from '../Containers/SplashScreen';
 
 const Styles = eStyleSheet.create({
 	headerTitleStyle: {
@@ -97,13 +98,14 @@ const signedIn = createBottomTabNavigator(
 	}
 );
 
-export default isSignedIn =>
+export default () =>
 	createSwitchNavigator(
 		{
 			signedIn: { screen: signedIn },
 			signedOut: { screen: signedOut },
+			SplashScreen: { screen: SplashScreen },
 		},
 		{
-			initialRouteName: isSignedIn ? 'signedIn' : 'signedOut',
+			initialRouteName: 'SplashScreen',
 		}
 	);
