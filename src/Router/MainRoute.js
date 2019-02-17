@@ -3,24 +3,16 @@ import { createStackNavigator, createSwitchNavigator, createBottomTabNavigator }
 import { Login } from '../Containers/Login';
 import eStyleSheet from 'react-native-extended-stylesheet';
 import { Register } from '../Containers/Register';
-import { Donor } from '../Containers/Donor';
-import { Donee } from '../Containers/Donee';
-import { Reports } from '../Containers/Reports';
-import { Assets } from '../Containers/Assets';
-import { Volunteer } from '../Containers/Volunteer';
+
 import { Icon } from 'react-native-elements';
 import { SplashScreen } from '../Containers/SplashScreen';
-
-const Styles = eStyleSheet.create({
-	headerTitleStyle: {
-		color: '#F9A602',
-		fontSize: 24,
-		fontWeight: '600',
-	},
-	headerStyle: {
-		backgroundColor: '#000',
-	},
-});
+import { LoadingScreen } from '../Containers/LoadingScreen';
+import DonorRoute from './DonorRoute';
+import DoneeRoute from './DoneeRoute';
+import VolunteerRoute from './VolunteerRoute';
+import AdminRoute from './AdminRoute';
+import AdminStack from './AdminStack';
+import { Users } from '../Containers/Users';
 
 const signedOut = createStackNavigator(
 	{
@@ -42,67 +34,28 @@ const signedOut = createStackNavigator(
 	}
 );
 
-const signedIn = createBottomTabNavigator(
-	{
-		Donor: {
-			screen: Donor,
-			navigationOptions: {
-				tabBarLabel: 'Donor',
-				tabBarIcon: ({ tintColor }) => <Icon name="user" type="font-awesome" color={tintColor} size={24} />,
-			},
-		},
-		Donee: {
-			screen: Donee,
-			navigationOptions: {
-				tabBarLabel: 'Donee',
-				tabBarIcon: ({ tintColor }) => <Icon name="child" type="font-awesome" color={tintColor} size={24} />,
-			},
-		},
-		Volunteer: {
-			screen: Volunteer,
-			navigationOptions: {
-				tabBarLabel: 'Volunteer',
-				tabBarIcon: ({ tintColor }) => (
-					<Icon name="odnoklassniki" type="font-awesome" color={tintColor} size={24} />
-				),
-			},
-		},
-		Assets: {
-			screen: Assets,
-			navigationOptions: {
-				tabBarLabel: 'Assets',
-				tabBarIcon: ({ tintColor }) => <Icon name="dollar" type="font-awesome" color={tintColor} size={24} />,
-			},
-		},
-		Reports: {
-			screen: Reports,
-			navigationOptions: {
-				tabBarLabel: 'Reports',
-				tabBarIcon: ({ tintColor }) => <Icon name="file-o" type="font-awesome" color={tintColor} size={24} />,
-			},
-		},
-	},
-	{
-		initialRouteName: 'Donor',
-		activeTintColor: '#7D4976',
-		lazy: false,
-		tabBarOptions: {
-			activeTintColor: '#FFF',
-			style: {
-				backgroundColor: '#7D4976',
-			},
-		},
-		navigationOptions: {
-			header: null,
-		},
-	}
-);
+// const signedIn = createStackNavigator(
+// 	{
+// 		LoadingScreen: { screen: LoadingScreen },
+// 		Users: { screen: Users },
+// 		DonorStack: { screen: DonorStack },
+// 		DoneeStack: { screen: DoneeStack },
+// 		VolunteerStack: { screen: VolunteerStack },
+// 		AdminStack: { screen: AdminStack },
+// 	},
+// 	{
+// 		initialRouteName: 'LoadingScreen',
+// 	}
+// );
 
 export default () =>
 	createSwitchNavigator(
 		{
-			signedIn: { screen: signedIn },
 			signedOut: { screen: signedOut },
+			AdminRoute: { screen: AdminRoute },
+			DonorRoute: { screen: DonorRoute },
+			DoneeRoute: { screen: DoneeRoute },
+			VolunteerRoute: { screen: VolunteerRoute },
 			SplashScreen: { screen: SplashScreen },
 		},
 		{

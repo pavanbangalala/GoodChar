@@ -3,12 +3,12 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import Styles from './Styles';
 import { signOutUser } from '../../Utils/Firebase';
 
-export default class Assets extends Component {
+export default class DonorsToMeet extends Component {
 	render() {
 		return (
 			<View style={Styles.container}>
 				<TouchableOpacity onPress={() => signOutUser()}>
-					<Text>Assets Screen</Text>
+					<Text>Meetings Screen</Text>
 				</TouchableOpacity>
 			</View>
 		);

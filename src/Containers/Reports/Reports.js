@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import Styles from './Styles';
+import { signOutUser } from '../../Utils/Firebase';
 
 export default class Reports extends Component {
 	render() {
 		return (
 			<View style={Styles.container}>
-				<Text>Reports Screen</Text>
+				<TouchableOpacity onPress={() => signOutUser()}>
+					<Text>Reports Screen</Text>
+				</TouchableOpacity>
 			</View>
 		);
 	}

@@ -5,6 +5,7 @@ import { UserInput } from '../../Components/UserInput';
 import { Button } from '../../Components/Button';
 import { TextLink } from '../../Components/TextLink';
 import * as firebase from 'firebase';
+import { Loader } from '../../Components/Loader';
 
 const logo = require('../../../assets/ie.png');
 
@@ -18,63 +19,78 @@ export default class Register extends Component {
 			email: '',
 			password: '',
 			confirmPassword: '',
+			Loading: false,
 		};
 		this.logoSize = new Animated.Value(Styles.$logoNormalWidth);
 		this.fontSize = new Animated.Value(40);
 		this.userInputMargin = new Animated.Value(16);
 	}
 
-	handleRegisterButton = async () => {
+	handleRegisterButton = () => {
 		if (this.state.userName.length === 0) {
 			Alert.alert('Enter a valid user name');
+			return;
 		}
 		if (this.state.email.length === 0) {
 			Alert.alert('Enter a valid email address');
+			return;
 		}
 		if (this.state.password.length === 0) {
 			Alert.alert('Enter a valid password');
+			return;
 		}
 		if (this.state.confirmPassword.length === 0 || this.state.password !== this.state.confirmPassword) {
 			Alert.alert('Passwords do not match');
+			return;
 		}
 		const { email, password } = this.state;
-		const uid = '';
-		const returnCode = await firebase
+		let uid = '';
+
+		firebase
 			.auth()
 			.createUserWithEmailAndPassword(email, password)
 			.then(user => {
 				console.log('email', user.email);
 				console.log('uid', user.uid);
 				uid = user.uid;
-				return 200;
+				console.log('database saving user ', this.state.email);
+				this.setState({ Loading: false });
+				const rootRef = firebase.database().ref();
+				const userRef = rootRef.child('users');
+				userRef.push({
+					uid: uid,
+					name: this.state.userName,
+					email: this.state.email,
+					type: this.getUserType(this.state.userName),
+				});
 			})
 			.catch(error => {
 				console.log(error);
+				this.setState({ Loading: false });
 				if (error.code === 'auth/email-already-in-use') {
-					return 201;
+					Alert.alert('Already an existing user');
+				} else {
+					Alert.alert('Registration faiiled');
 				}
-				return 203;
 			});
-
-		console.log('return code = ', returnCode);
-		if (returnCode === 200) {
-			console.log('saving user ', this.state.email);
-			firebase
-				.database()
-				.ref(`users/${uid}`)
-				.set({
-					name: this.state.userName,
-					email: this.state.email,
-					isAdmin: this.state.email === 'pawan.bangalala@gmail.com' ? true : false,
-				});
-			Alert.alert('Registered in Succesfully');
-		} else if (returnCode === 201) {
-			Alert.alert('Already an existing user');
-		} else {
-			Alert.alert('Registration faiiled');
-		}
+		this.setState({ Loading: true });
 	};
 
+	getUserType = userName => {
+		if (userName.toLowerCase().indexOf('admin') > -1) {
+			console.log('user name has admin');
+			return 'admin';
+		} else if (userName.toLowerCase().indexOf('volunteer') > -1) {
+			console.log('user name has volunteer');
+			return 'volunteer';
+		} else if (userName.toLowerCase().indexOf('donor') > -1) {
+			console.log('user name has donor');
+			return 'donor';
+		} else {
+			console.log('user name has donee');
+			return 'donee';
+		}
+	};
 	componentDidMount() {
 		const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
 		const hideEvent = Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
@@ -143,7 +159,11 @@ export default class Register extends Component {
 					</Animated.View>
 
 					<UserInput placeHolder="User Name" onChangeText={value => this.setState({ userName: value })} />
-					<UserInput placeHolder="E-maiil" onChangeText={value => this.setState({ email: value })} />
+					<UserInput
+						placeHolder="E-mail"
+						onChangeText={value => this.setState({ email: value })}
+						autoCapitalize="none"
+					/>
 					<UserInput
 						placeHolder="Password"
 						onChangeText={value => this.setState({ password: value })}
@@ -157,6 +177,7 @@ export default class Register extends Component {
 
 					<TextLink label1="already a volunteer? " label2="Login" onPress={this.handleLoginButtoon} />
 				</KeyboardAvoidingView>
+				{this.state.Loading && <Loader Loading={this.state.Loading} />}
 			</SafeAreaView>
 		);
 	}

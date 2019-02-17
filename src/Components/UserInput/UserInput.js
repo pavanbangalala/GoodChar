@@ -18,7 +18,7 @@ export default class UserInput extends Component {
 
 	componentDidMount() {}
 	render() {
-		const { placeHolder } = this.props;
+		const { placeHolder, autoCapitalize } = this.props;
 		return (
 			<View style={Styles.container}>
 				<TextInput
@@ -28,6 +28,9 @@ export default class UserInput extends Component {
 					placeholder={placeHolder}
 					value={this.state.text}
 					numberOfLines={1}
+					autoCapitalize={autoCapitalize}
+					autoCorrect={false}
+					underlineColorAndroid="transparent"
 				/>
 			</View>
 		);

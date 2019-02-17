@@ -5,6 +5,7 @@ import { UserInput } from '../../Components/UserInput';
 import { Button } from '../../Components/Button';
 import { TextLink } from '../../Components/TextLink';
 import * as firebase from 'firebase';
+import { Loader } from '../../Components/Loader';
 
 const logo = require('../../../assets/ie.png');
 
@@ -14,6 +15,7 @@ export default class Login extends Component {
 		this.state = {
 			email: '',
 			Password: '',
+			Loading: false,
 		};
 		this.handleLoginButton = this.handleLoginButton.bind(this);
 		this.handleSignUpButtoon = this.handleSignUpButtoon.bind(this);
@@ -22,15 +24,18 @@ export default class Login extends Component {
 		//console.log('logoSize', this.logoSize);
 	}
 
-	handleLoginButton = async () => {
+	handleLoginButton = () => {
 		const { email, password } = this.state;
+
 		if (email.length > 0 && password.length > 0) {
-			await firebase
+			firebase
 				.auth()
 				.signInWithEmailAndPassword(email, password)
-				.then(user => Alert.alert('Login success'))
-				.catch(error => Alert.alert('Invalid credentials'));
+				.then(this.setState({ Loading: false }))
+				.catch(error => this.setState({ Loading: false }));
 		}
+
+		this.setState({ Loading: true });
 	};
 
 	handleSignUpButtoon = () => {
@@ -89,12 +94,22 @@ export default class Login extends Component {
 						<Animated.Text style={logoFontStyle}>Good Char</Animated.Text>
 					</View>
 
-					<UserInput focus placeHolder="User Name" onChangeText={value => this.setState({ email: value })} />
-					<UserInput placeHolder="Password" onChangeText={value => this.setState({ password: value })} />
+					<UserInput
+						focus
+						placeHolder="User Name"
+						onChangeText={value => this.setState({ email: value })}
+						autoCapitalize="none"
+					/>
+					<UserInput
+						placeHolder="Password"
+						onChangeText={value => this.setState({ password: value })}
+						autoCapitalize="none"
+					/>
 					<Button label="Login" onPress={this.handleLoginButton} />
 
 					<TextLink label1="new volunteer? " label2="Sign Up" onPress={this.handleSignUpButtoon} />
 				</KeyboardAvoidingView>
+				{this.state.Loading && <Loader Loading={this.state.Loading} />}
 			</View>
 		);
 	}

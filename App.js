@@ -18,6 +18,7 @@ const firebaseConfig = {
 	databaseURL: 'https://goodchar-3b1ff.firebaseio.com',
 	projectId: 'goodchar-3b1ff',
 	storageBucket: 'goodchar-3b1ff.appspot.com',
+	persistence: true,
 };
 
 eStyleSheet.build({
