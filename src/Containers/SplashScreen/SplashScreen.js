@@ -41,7 +41,12 @@ export default class SplashScreen extends Component {
 					}.bind(this)
 				);
 			} else {
-				this.props.navigation.navigate('signedOut');
+				setTimeout(
+					function() {
+						this.props.navigation.navigate('signedOut');
+					}.bind(this),
+					1000
+				);
 			}
 		});
 	}

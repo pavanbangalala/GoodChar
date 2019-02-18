@@ -26,13 +26,16 @@ export default class Login extends Component {
 
 	handleLoginButton = () => {
 		const { email, password } = this.state;
-
+		Keyboard.dismiss();
 		if (email.length > 0 && password.length > 0) {
 			firebase
 				.auth()
 				.signInWithEmailAndPassword(email, password)
 				.then(this.setState({ Loading: false }))
-				.catch(error => this.setState({ Loading: false }));
+				.catch(error => {
+					this.setState({ Loading: false });
+					Alert.alert('Invalid credentials');
+				});
 		}
 
 		this.setState({ Loading: true });

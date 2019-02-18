@@ -38,6 +38,7 @@ export default class App extends Component {
 		this.state = {
 			user: null,
 		};
+		console.disableYellowBox = true;
 	}
 
 	render() {
